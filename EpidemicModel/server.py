@@ -3,7 +3,7 @@ from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import ChartModule
 from mesa.visualization.UserParam import UserSettableParameter
-from EpidemicModel.model import MoneyModel
+from EpidemicModel.model import SimModel
 
 
 def agent_portrayal(agent):
@@ -26,7 +26,7 @@ chat = ChartModule([{"Label": "Gini",
                    data_collector_name='datacollector')
 n_slider = UserSettableParameter('slider', "Number of Agents", 100, 2, 200, 1)
 grid = CanvasGrid(agent_portrayal, 10, 10, 500, 500)
-server = ModularServer(MoneyModel,
+server = ModularServer(SimModel,
                        [grid, chat],
                        "Money Model",
                        {"N": n_slider, "width": 10, "height": 10})

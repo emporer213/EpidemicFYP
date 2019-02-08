@@ -6,7 +6,7 @@ from mesa.datacollection import DataCollector
 import random
 
 
-class MoneyAgent(Agent):
+class EpiAgent(Agent):
     """An agent with fixed initial wealth."""
 
     def __init__(self, unique_id, model):
@@ -42,7 +42,7 @@ def compute_gini(model):
     return (1 + (1 / N) - 2 * B)
 
 
-class MoneyModel(Model):
+class SimModel(Model):
     """A model with some number of agents."""
 
     def __init__(self, N, width, height):
@@ -53,7 +53,7 @@ class MoneyModel(Model):
 
         # Create Agents
         for i in range(self.num_agents):
-            a = MoneyAgent(i, self)
+            a = EpiAgent(i, self)
             self.schedule.add(a)
             x = random.randrange(self.grid.width)
             y = random.randrange(self.grid.height)
