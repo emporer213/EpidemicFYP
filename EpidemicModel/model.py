@@ -11,7 +11,7 @@ class EpiAgent(Agent):
 
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
-        self.wealth = 1
+        self.health_state = 1
 
     def move(self):
         possible_steps = self.model.grid.get_neighborhood(
@@ -21,25 +21,27 @@ class EpiAgent(Agent):
         new_position = random.choice(possible_steps)
         self.model.grid.move_agent(self, new_position)
 
-    def give_money(self):
+    def infect(self):
         cellmates = self.model.grid.get_cell_list_contents([self.pos])
-        if len(cellmates) > 1:
-            other = random.choice(cellmates)
-            other.wealth += 1
-            self.wealth -= 1
+        susceptible_cellmates = [cellmate for cellmate in cellmates if cellmate.health_state == 1]
+        if len(susceptible_cellmates) > 1:
+            other = random.choice(susceptible_cellmates)
+            other.health_state = 2
 
     def step(self):
         self.move()
-        if self.wealth > 0:
-            self.give_money()
+        if self.health_state == 2:
+            self.infect()
 
 
-def compute_gini(model):
-    agent_wealths = [agent.wealth for agent in model.schedule.agents]
-    x = sorted(agent_wealths)
-    N = model.num_agents
-    B = sum(xi * (N - i) for i, xi in enumerate(x)) / (N * sum(x))
-    return (1 + (1 / N) - 2 * B)
+def compute_infections(model):
+    agents_infected = [agent.health_state for agent in model.schedule.agents if agent.health_state == 2]
+    return len(agents_infected)
+
+
+def compute_healthy(model):
+    agents_healthy = [agent.health_state for agent in model.schedule.agents if agent.health_state == 1]
+    return len(agents_healthy)
 
 
 class SimModel(Model):
@@ -59,9 +61,12 @@ class SimModel(Model):
             y = random.randrange(self.grid.height)
             self.grid.place_agent(a, (x, y))
 
+        patient_zero = random.choice(self.schedule.agents)
+        patient_zero.health_state = 2
+
         self.datacollector = DataCollector(
-            model_reporters={"Gini": compute_gini},  # A function to call
-            agent_reporters={"Wealth": "wealth"}  # An agent attribute
+            model_reporters={"Rate of Infection": compute_infections, "Decline of Health": compute_healthy},
+            agent_reporters={"Infected": "health_state"}  # An agent attribute
         )
 
     def step(self):
