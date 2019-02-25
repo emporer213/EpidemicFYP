@@ -4,6 +4,7 @@ from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.modules import ChartModule
 from mesa.visualization.UserParam import UserSettableParameter
 from EpidemicModel.model import SimModel
+from EpidemicModel.ButtonModule import ButtonModule
 
 
 def agent_portrayal(agent):
@@ -26,7 +27,8 @@ infected_chart = ChartModule([{"Label": "Rate of Infection",
                              data_collector_name='datacollector')
 n_slider = UserSettableParameter('slider', "Number of Agents", 100, 2, 200, 1)
 grid = CanvasGrid(agent_portrayal, 10, 10, 500, 500)
+save_button = ButtonModule()
 server = ModularServer(SimModel,
-                       [grid, infected_chart],
+                       [grid, infected_chart, save_button],
                        "Sim Model",
                        {"N": n_slider, "width": 10, "height": 10})

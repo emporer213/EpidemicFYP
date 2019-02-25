@@ -4,6 +4,7 @@ from mesa.time import RandomActivation
 from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
 import random
+import pandas as pd
 
 
 class EpiAgent(Agent):
@@ -72,3 +73,8 @@ class SimModel(Model):
     def step(self):
         self.datacollector.collect(self)
         self.schedule.step()
+
+    def save_data(dataframe, file_name):
+        writer = pd.ExcelWriter(file_name + '.xlsx')
+        dataframe.to_excel(writer, 'DataFrame')
+        writer.save()
