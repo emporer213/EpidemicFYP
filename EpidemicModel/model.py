@@ -1,10 +1,11 @@
 # model.py
 from mesa import Agent, Model
 from mesa.time import RandomActivation
-from mesa.space import MultiGrid
+from mesa.space import ContinuousSpace
 from mesa.datacollection import DataCollector
 import random
 import pandas as pd
+from EpidemicModel.DiseaseModel import DiseaseModel
 
 
 class EpiAgent(Agent):
@@ -15,18 +16,17 @@ class EpiAgent(Agent):
         self.health_state = 1
 
     def move(self):
-        possible_steps = self.model.grid.get_neighborhood(
-            self.pos,
-            moore=True,
-            include_center=False)
-        new_position = random.choice(possible_steps)
+        new_position_x = self.pos[0] + range(0, 8)
+        new_position_y = self.pos[1] + range(0, 8)
+        new_position = (new_position_x, new_position_y)
         self.model.grid.move_agent(self, new_position)
 
     def infect(self):
-        cellmates = self.model.grid.get_cell_list_contents([self.pos])
-        susceptible_cellmates = [cellmate for cellmate in cellmates if cellmate.health_state == 1]
-        if len(susceptible_cellmates) > 1:
-            other = random.choice(susceptible_cellmates)
+        neighbours = self.model.space.get_neighbours(self.pos,
+                                                     self.model.disease_model.infection_radius,
+                                                     include_center=False)
+        if len(neighbours) > 1:
+            
             other.health_state = 2
 
     def step(self):
@@ -51,16 +51,17 @@ class SimModel(Model):
     def __init__(self, N, width, height):
         self.running = True
         self.num_agents = N
-        self.grid = MultiGrid(width, height, True)
+        self.space = ContinuousSpace(width, height, True)
         self.schedule = RandomActivation(self)
+        self.disease_model = DiseaseModel()
 
         # Create Agents
         for i in range(self.num_agents):
             a = EpiAgent(i, self)
             self.schedule.add(a)
-            x = random.randrange(self.grid.width)
-            y = random.randrange(self.grid.height)
-            self.grid.place_agent(a, (x, y))
+            x = random.randrange(self.space.width)
+            y = random.randrange(self.space.height)
+            self.space.place_agent(a, (x, y))
 
         patient_zero = random.choice(self.schedule.agents)
         patient_zero.health_state = 2
