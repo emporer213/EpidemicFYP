@@ -14,25 +14,29 @@ class EpiAgent(Agent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.health_state = 1
+        self.infected_step = self.model.steps
 
     def move(self):
-        new_position_x = self.pos[0] + range(0, 8)
-        new_position_y = self.pos[1] + range(0, 8)
+        new_position_x = self.pos[0] + random.randrange(-8, 8)
+        new_position_y = self.pos[1] + random.randrange(-8, 8)
         new_position = (new_position_x, new_position_y)
-        self.model.grid.move_agent(self, new_position)
+        self.model.space.move_agent(self, new_position)
 
     def infect(self):
-        neighbours = self.model.space.get_neighbours(self.pos,
-                                                     self.model.disease_model.infection_radius,
-                                                     include_center=False)
+        neighbours = self.model.space.get_neighbors(self.pos, self.model.disease_model.infection_radius,
+                                                    include_center=False)
         if len(neighbours) > 1:
-            
-            other.health_state = 2
+            for neighbour in neighbours:
+                if neighbour.health_state == 1:
+                    neighbour.health_state = 2
+                    neighbour.infected_step = self.model.steps
 
     def step(self):
         self.move()
         if self.health_state == 2:
             self.infect()
+            if self.infected_step > self.model.disease_model.infection_duration:
+                self.health_state = 3
 
 
 def compute_infections(model):
@@ -41,7 +45,8 @@ def compute_infections(model):
 
 
 def compute_healthy(model):
-    agents_healthy = [agent.health_state for agent in model.schedule.agents if agent.health_state == 1]
+    agents_healthy = [agent.health_state for agent in model.schedule.agents if (agent.health_state == 1) or
+                      (agent.health_state == 3)]
     return len(agents_healthy)
 
 
@@ -54,6 +59,7 @@ class SimModel(Model):
         self.space = ContinuousSpace(width, height, True)
         self.schedule = RandomActivation(self)
         self.disease_model = DiseaseModel()
+        self.steps = 0
 
         # Create Agents
         for i in range(self.num_agents):
@@ -74,6 +80,7 @@ class SimModel(Model):
     def step(self):
         self.datacollector.collect(self)
         self.schedule.step()
+        self.steps += 1
 
     def save_data(dataframe, file_name):
         writer = pd.ExcelWriter(file_name + '.xlsx')
