@@ -2,7 +2,7 @@ from mesa.visualization.ModularVisualization import VisualizationElement
 
 
 class SimpleCanvas(VisualizationElement):
-    local_includes = ["simple_continuous_canvas.js", "styles.css"]
+    local_includes = ["simple_continuous_canvas.js"]
     portrayal_method = None
     canvas_height = 500
     canvas_width = 500

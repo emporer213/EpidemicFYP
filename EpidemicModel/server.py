@@ -12,26 +12,30 @@ def agent_portrayal(agent):
     portrayal = {"Shape": "circle",
                  "Filled": "true",
                  "Color": "grey",
-                 "r": 5}
+                 "r": 3}
 
-    if agent.health_state == 2:
+    if agent.health_state == agent.model.disease_model.health_state_dictionary.get("Infected")[1]:
         portrayal["Color"] = "red"
         portrayal["Layer"] = 0
-        portrayal["r"] = 2.5
-    elif agent.health_state == 3:
+        portrayal["r"] = 2
+    elif agent.health_state == agent.model.disease_model.health_state_dictionary.get("Recovered")[1]:
         portrayal["Color"] = "green"
         portrayal["Layer"] = 1
-        portrayal["r"] = 4
+        portrayal["r"] = 3
+    elif agent.health_state == agent.model.disease_model.health_state_dictionary.get("Exposed")[1]:
+        portrayal["Color"] = "yellow"
+        portrayal["Layer"] = 2
+        portrayal["r"] = 2.5
     return portrayal
 
 
 infected_chart = ChartModule([{"Label": "Rate of Infection",
                                "Color": "Red"}, {"Label": "Decline of Health", "Color": "Green"}],
                              data_collector_name='datacollector')
-n_slider = UserSettableParameter('slider', "Number of Agents", 100, 2, 200, 1)
-space = SimpleCanvas(agent_portrayal, 500, 500)
+n_slider = UserSettableParameter('slider', "Number of Agents", 100, 2, 10000, 1)
+space = SimpleCanvas(agent_portrayal, canvas_height=500, canvas_width=500)
 save_button = ButtonModule()
 server = ModularServer(SimModel,
                        [space, infected_chart, save_button],
                        "Sim Model",
-                       {"N": n_slider, "width": 50, "height": 50})
+                       {"N": n_slider, "width": 500, "height": 500})
