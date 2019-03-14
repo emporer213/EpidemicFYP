@@ -41,18 +41,25 @@ class Area:
 
 
 def pop_gen(pop_size, model):
-    agent_count = 0
-    area_list = [Area((200, 800), 20, 100),
-                 Area((800, 200), 30, 200),
-                 Area((800, 800), 15, 50),
-                 Area((100, 200), 15, 50),
-                 Area((500, 500), 20, 100)]
+    agent_id = 1
+    area_list = [Area((250, 250), 20, 50),   #
+                 Area((50, 50), 30, 75),
+                 Area((300, 50), 15, 25),    #aasaaaaaa
+                 Area((400, 400), 15, 25),   #
+                 Area((500, 600), 20, 50)]
+    for al in area_list:
+        pop_range = round((pop_size/100) * al.percentage)
+        for i in range(pop_range):
+            a = EpiAgent(agent_id, model)
+            model.schedule.add(a)
+            x = random.randrange(al.location[0] - al.location_radius, al.location[0] + al.location_radius)
+            y = random.randrange(al.location[1] - al.location_radius, al.location[1] + al.location_radius)
+            model.space.place_agent(a, (x, y))
+            al.agents.append(a)
+            agent_id += 1
 
-    for i in range(pop_size):
-        a = EpiAgent(i, model)
-        model.schedule.add(a)
-        /,,,
-
+    patient_zero = random.choice(model.schedule.agents)
+    patient_zero.health_state = model.disease_model.health_state_dictionary.get("Infected")[1]
 
 
 

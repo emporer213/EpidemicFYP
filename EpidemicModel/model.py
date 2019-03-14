@@ -3,10 +3,10 @@ from mesa import Model
 from mesa.time import RandomActivation
 from mesa.space import ContinuousSpace
 from mesa.datacollection import DataCollector
-import random
+
 import pandas as pd
 from EpidemicModel.DiseaseModel import *
-from EpidemicModel.PopGen import EpiAgent
+from EpidemicModel.PopGen import pop_gen
 
 
 def compute_infections(model):
@@ -16,8 +16,9 @@ def compute_infections(model):
 
 
 def compute_healthy(model):
-    agents_healthy = [agent.health_state for agent in model.schedule.agents if (agent.health_state == model.disease) or
-                      (agent.health_state == 3)]
+    agents_healthy = [agent.health_state for agent in model.schedule.agents if (agent.health_state ==
+                     model.disease_model.health_state_dictionary.get("Recovered")[1]) or
+                     (agent.health_state == model.disease_model.health_state_dictionary.get("Susceptible")[1])]
     return len(agents_healthy)
 
 
@@ -32,6 +33,9 @@ class SimModel(Model):
         self.disease_model = SEIRModel(infection_radius=10)
         self.steps = 0
 
+        pop_gen(N, self)
+
+        '''
         # Create Agents
         for i in range(self.num_agents):
             a = EpiAgent(i, self)
@@ -39,9 +43,7 @@ class SimModel(Model):
             x = random.randrange(self.space.width)
             y = random.randrange(self.space.height)
             self.space.place_agent(a, (x, y))
-
-        patient_zero = random.choice(self.schedule.agents)
-        patient_zero.health_state = self.disease_model.health_state_dictionary.get("Infected")[1]
+        '''
 
         self.datacollector = DataCollector(
             model_reporters={"Rate of Infection": compute_infections, "Decline of Health": compute_healthy},
