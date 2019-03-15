@@ -1,20 +1,31 @@
 from mesa import Agent
 import random
+import numpy as np
+import traceback
 
 
 class EpiAgent(Agent):
     """An agent with fixed initial wealth."""
 
-    def __init__(self, unique_id, model):
+    def __init__(self, unique_id, model, velocity, speed):
         super().__init__(unique_id, model)
         self.health_state = 1
         self.infected_step = self.model.steps
+        self.velocity = velocity
+        self.speed = speed
 
     def move(self):
-        new_position_x = self.pos[0] + random.randrange(-8, 8)
-        new_position_y = self.pos[1] + random.randrange(-8, 8)
-        new_position = (new_position_x, new_position_y)
-        self.model.space.move_agent(self, new_position)
+        """new_position_x = self.pos[0] + random.randrange(-8, 8)
+        new_position_y = self.pos[1] + random.randrange(-8, 8)"""
+        other_agent = random.choice(self.model.schedule.agents)
+        self.velocity = self.model.space.get_heading(self.pos, other_agent.pos )
+        self.velocity /= np.linalg.norm(self.velocity)
+        new_position = self.pos + self.velocity * self.speed
+        try:
+            self.model.space.move_agent(self, new_position)
+        except:
+            print(self.unique_id, " ", self.velocity, " ")
+            traceback.print_exc()
 
     def step(self):
         self.move()
@@ -42,15 +53,16 @@ class Area:
 
 def pop_gen(pop_size, model):
     agent_id = 1
-    area_list = [Area((250, 250), 20, 50),   #
+    area_list = [Area((250, 250), 20, 50),
                  Area((50, 50), 30, 75),
-                 Area((300, 50), 15, 25),    #aasaaaaaa
-                 Area((400, 400), 15, 25),   #
+                 Area((300, 50), 15, 25),
+                 Area((400, 400), 15, 25),
                  Area((500, 600), 20, 50)]
     for al in area_list:
         pop_range = round((pop_size/100) * al.percentage)
         for i in range(pop_range):
-            a = EpiAgent(agent_id, model)
+            velocity = np.random.random(2) * 2 - 1
+            a = EpiAgent(agent_id, model, velocity, 2)
             model.schedule.add(a)
             x = random.randrange(al.location[0] - al.location_radius, al.location[0] + al.location_radius)
             y = random.randrange(al.location[1] - al.location_radius, al.location[1] + al.location_radius)
