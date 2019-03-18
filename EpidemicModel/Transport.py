@@ -2,6 +2,12 @@ import numpy as np
 from mesa import Agent
 
 
+class TrainLine:
+
+    def __init__(self, station_list):
+        self.station_list = station_list
+
+
 class Train(Agent):
 
     def __init__(self, passengers, current_station, next_station, pos, model, speed, unique_id, line, current_index):
@@ -41,3 +47,8 @@ class Train(Agent):
             self.move()
 
 
+class Station:
+
+    def __init__(self, pos):
+        self.train_list = None
+        self.pos = pos
