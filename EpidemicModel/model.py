@@ -11,16 +11,17 @@ from EpidemicModel.Transport import *
 
 
 def compute_infections(model):
-    agents_infected = [agent.health_state for agent in model.schedule.agents if agent.health_state ==
-                       model.disease_model.health_state_dictionary.get("Infected")[1] and agent.type == 0]
+    human_agents = [agent for agent in model.schedule.agents if agent.type == 0]
+    agents_infected = [agent.health_state for agent in human_agents if agent.health_state ==
+                       model.disease_model.health_state_dictionary.get("Infected")[1]]
     return len(agents_infected)
 
 
 def compute_healthy(model):
-    agents_healthy = [agent.health_state for agent in model.schedule.agents if (agent.health_state ==
-                      model.disease_model.health_state_dictionary.get("Recovered")[1] and agent.type == 0) or
-                      (agent.health_state == model.disease_model.health_state_dictionary.get("Susceptible")[1]
-                      and agent.type == 0)]
+    human_agents = [agent for agent in model.schedule.agents if agent.type == 0]
+    agents_healthy = [agent.health_state for agent in human_agents if (agent.health_state ==
+                      model.disease_model.health_state_dictionary.get("Recovered")[1]) or
+                      (agent.health_state == model.disease_model.health_state_dictionary.get("Susceptible")[1])]
     return len(agents_healthy)
 
 
