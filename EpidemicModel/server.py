@@ -12,20 +12,46 @@ def agent_portrayal(agent):
     portrayal = {"Shape": "circle",
                  "Filled": "true",
                  "Color": "grey",
-                 "r": 3}
+                 "LineColor": "grey"}
+    if agent.type == 0:
+        if agent.health_state == agent.model.disease_model.health_state_dictionary.get("Infected")[1]:
+            portrayal["Color"] = "red"
+            portrayal["LineColor"] = "red"
+            portrayal["Layer"] = 0
+            portrayal["r"] = 2
+        elif agent.health_state == agent.model.disease_model.health_state_dictionary.get("Recovered")[1]:
+            portrayal["Color"] = "green"
+            portrayal["LineColor"] = "green"
+            portrayal["Layer"] = 1
+            portrayal["r"] = 3
+        elif agent.health_state == agent.model.disease_model.health_state_dictionary.get("Exposed")[1]:
+            portrayal["Color"] = "yellow"
+            portrayal["LineColor"] = "yellow"
+            portrayal["Layer"] = 2
+            portrayal["r"] = 2.5
+        else:
+            portrayal["r"] = 3
 
-    if agent.health_state == agent.model.disease_model.health_state_dictionary.get("Infected")[1]:
-        portrayal["Color"] = "red"
-        portrayal["Layer"] = 0
-        portrayal["r"] = 2
-    elif agent.health_state == agent.model.disease_model.health_state_dictionary.get("Recovered")[1]:
-        portrayal["Color"] = "green"
-        portrayal["Layer"] = 1
-        portrayal["r"] = 3
-    elif agent.health_state == agent.model.disease_model.health_state_dictionary.get("Exposed")[1]:
-        portrayal["Color"] = "yellow"
-        portrayal["Layer"] = 2
-        portrayal["r"] = 2.5
+        if agent.is_at_work():
+            portrayal["LineColor"] = "orange"
+        elif agent.is_at_home():
+            portrayal["LineColor"] = "blue"
+        return portrayal
+
+    if agent.type == 1:
+        portrayal["Shape"] = "rect"
+        portrayal["Color"] = "PaleTurquoise"
+        portrayal["LineColor"] = "PaleTurquoise"
+        portrayal["Layer"] = 3
+        portrayal["w"] = 0.05
+        portrayal["h"] = 0.02
+        return portrayal
+
+    if agent.type == 2:
+        portrayal["Color"] = "MidnightBlue"
+        portrayal["LineColor"] = "MidnightBlue"
+        portrayal["r"] = 5
+        return portrayal
     return portrayal
 
 

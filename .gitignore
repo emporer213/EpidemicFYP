@@ -109,3 +109,6 @@ venv.bak/
 
 
 EpidemicModel/results\.xlsx
+
+\.idea/workspace\.xml
+!/venv/Lib/site-packages/mesa/time.py

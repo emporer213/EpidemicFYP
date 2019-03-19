@@ -9,12 +9,12 @@ var ContinuousVisualization = function(height, width, context) {
 			if (p.Shape == "rect")
 				this.drawRectange(p.x, p.y, p.w, p.h, p.Color, p.Filled);
 			if (p.Shape == "circle")
-				this.drawCircle(p.x, p.y, p.r, p.Color, p.Filled);
+				this.drawCircle(p.x, p.y, p.r, p.Color, p.Filled, p.LineColor);
 		};
 
 	};
 
-	this.drawCircle = function(x, y, radius, color, fill) {
+	this.drawCircle = function(x, y, radius, color, fill, lineColor) {
 		var cx = x * width;
 		var cy = y * height;
 		var r = radius;
@@ -23,7 +23,7 @@ var ContinuousVisualization = function(height, width, context) {
 		context.arc(cx, cy, r, 0, Math.PI * 2, false);
 		context.closePath();
 
-		context.strokeStyle = color;
+		context.strokeStyle = lineColor;
 		context.stroke();
 
 		if (fill) {
