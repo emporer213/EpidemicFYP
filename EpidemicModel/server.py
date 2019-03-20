@@ -38,20 +38,30 @@ def agent_portrayal(agent):
             portrayal["LineColor"] = "blue"
         return portrayal
 
-    if agent.type == 1:
-        portrayal["Shape"] = "rect"
-        portrayal["Color"] = "PaleTurquoise"
-        portrayal["LineColor"] = "PaleTurquoise"
-        portrayal["Layer"] = 3
-        portrayal["w"] = 0.05
-        portrayal["h"] = 0.02
-        return portrayal
+    return portrayal
 
-    if agent.type == 2:
-        portrayal["Color"] = "MidnightBlue"
-        portrayal["LineColor"] = "MidnightBlue"
-        portrayal["r"] = 5
-        return portrayal
+
+def station_portrayal(station):
+    portrayal = {
+        "Shape": "circle",
+        "Filled": "True",
+        "Color": "MidnightBlue",
+        "Layer": 2,
+        "LineColor": "MidnightBlue",
+        "r": 5
+    }
+    return portrayal
+
+
+def train_portrayal(train):
+    portrayal = {
+        "Shape": "rect",
+        "Color": "PaleTurquoise",
+        "LineColor": "PaleTurquoise",
+        "Layer": 3,
+        "w": 0.025,
+        "h": 0.01
+    }
     return portrayal
 
 
@@ -59,7 +69,7 @@ infected_chart = ChartModule([{"Label": "Rate of Infection",
                                "Color": "Red"}, {"Label": "Decline of Health", "Color": "Green"}],
                              data_collector_name='datacollector')
 n_slider = UserSettableParameter('slider', "Number of Agents", 2000, 2, 10000, 1)
-space = SimpleCanvas(agent_portrayal, canvas_height=1000, canvas_width=1000)
+space = SimpleCanvas(agent_portrayal, station_portrayal, train_portrayal, canvas_height=1000, canvas_width=1000)
 save_button = ButtonModule()
 server = ModularServer(SimModel,
                        [space, infected_chart, save_button],
