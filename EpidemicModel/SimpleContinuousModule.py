@@ -40,7 +40,7 @@ class SimpleCanvas(VisualizationElement):
                     train_portrayal["x"] = x
                     train_portrayal["y"] = y
                     space_state.append(train_portrayal)
-                station_portrayal = self.stationPortrayal_method
+                station_portrayal = self.stationPortrayal_method(station)
                 x, y = self.calc_portrayal_xy(station.pos, model)
                 station_portrayal["x"] = x
                 station_portrayal["y"] = y

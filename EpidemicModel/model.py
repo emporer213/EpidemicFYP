@@ -49,6 +49,7 @@ class SimModel(Model):
         self.disease_model = SEIRModel(infection_radius=10)
         self.steps = 0
         self.train_lines = []
+        self.train_list = []
         self.num_train_lines = train_line_num
         self.area_list = [Area((250, 250), 20, 50),
                           Area((50, 50), 30, 75),
@@ -85,26 +86,23 @@ class SimModel(Model):
 
     def generate_transport_net(self, stn_limit):
         for al in self.area_list:
-            self.agent_ids += 1
-            station_list = [Station(al.location, self.agent_ids, self)]
-            self.schedule.add(station_list[0])
+            station_list = [Station(al.location)]
             index = 0
             for s in range(0, random.randrange(stn_limit[0], stn_limit[1])):
-                self.agent_ids += 1
-                new_station_pos = self.calculate_move(station_list[index].pos, self.space.center, 20)
-                new_station = Station(new_station_pos, self.agent_ids, self)
+                new_station_pos = self.calculate_move(station_list[index].pos, self.space.center, 30)
+                new_station = Station(new_station_pos)
                 new_station.prev_station = station_list[index]
                 station_list[index].next_station = new_station
                 station_list.append(new_station)
-                self.schedule.add(new_station)
                 index += 1
             self.train_lines.append(TrainLine(station_list))
 
             for st in station_list:
                 if random.choice((True, False)):
                     self.agent_ids += 1
-                    tr = Train(None, st, st.pos, self, 8, self.agent_ids)
-                    self.schedule.add(tr)
+                    tr = Train(None, st, self, 8, self.agent_ids)
+                    self.space.place_agent(tr, st.pos)
+                    self.train_list .append(tr)
                     st.train_list.append(tr)
 
     def calculate_move(self, current_pos, dest_pos, speed):

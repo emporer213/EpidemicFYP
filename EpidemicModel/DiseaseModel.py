@@ -17,9 +17,10 @@ class SIRModel:
         neighbours = agent.model.space.get_neighbors(agent.pos, self.infection_radius, include_center=False)
         if len(neighbours) > 1:
             for neighbour in neighbours:
-                if neighbour.health_state == 1:
-                    neighbour.health_state = 2
-                    neighbour.infected_step = agent.model.steps
+                if neighbour.type == 0:
+                    if neighbour.health_state == 1:
+                        neighbour.health_state = 2
+                        neighbour.infected_step = agent.model.steps
 
 
 class SEIRModel(SIRModel):
@@ -34,9 +35,10 @@ class SEIRModel(SIRModel):
         neighbours = agent.model.space.get_neighbors(agent.pos, self.infection_radius, include_center=False)
         if len(neighbours) > 1:
             for neighbour in neighbours:
-                if neighbour.health_state == agent.model.disease_model.health_state_dictionary.get("Susceptible")[1]:
-                    neighbour.health_state = agent.model.disease_model.health_state_dictionary.get("Exposed")[1]
-                    neighbour.exposed_step = agent.model.steps
+                if neighbour.type == 0:
+                    if neighbour.health_state == agent.model.disease_model.health_state_dictionary.get("Susceptible")[1]:
+                        neighbour.health_state = agent.model.disease_model.health_state_dictionary.get("Exposed")[1]
+                        neighbour.exposed_step = agent.model.steps
 
 
 

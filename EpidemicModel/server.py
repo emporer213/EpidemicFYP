@@ -69,9 +69,9 @@ infected_chart = ChartModule([{"Label": "Rate of Infection",
                                "Color": "Red"}, {"Label": "Decline of Health", "Color": "Green"}],
                              data_collector_name='datacollector')
 n_slider = UserSettableParameter('slider', "Number of Agents", 2000, 2, 10000, 1)
-space = SimpleCanvas(agent_portrayal, station_portrayal, train_portrayal, canvas_height=1000, canvas_width=1000)
+space = SimpleCanvas(agent_portrayal, train_portrayal, station_portrayal, canvas_height=1000, canvas_width=1000)
 save_button = ButtonModule()
 server = ModularServer(SimModel,
                        [space, infected_chart, save_button],
                        "Sim Model",
-                       {"N": n_slider, "width": 1000, "height": 1000})
+                       {"N": 1000, "width": 1000, "height": 1000})

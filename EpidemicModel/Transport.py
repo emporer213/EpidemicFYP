@@ -1,5 +1,6 @@
 import numpy as np
 from mesa import Agent
+import random
 
 
 class TrainLine:
@@ -11,11 +12,11 @@ class TrainLine:
 
 class Train(Agent):
 
-    def __init__(self, passengers, current_station, pos, model, speed, unique_id):
+    def __init__(self, passengers, current_station, model, speed, unique_id):
         super().__init__(unique_id, model)
         self.passengers = passengers
         self.current_station = current_station
-        self.direction = 1
+        self.direction = random.randrange(0, 1)
 
         if self.direction == 1:
             if current_station.next_station is not None:
@@ -31,7 +32,7 @@ class Train(Agent):
                 self.direction = 1
 
         self.type = 1
-        self.pos = pos
+        self.pos = None
         self.velocity = None
         self.heading = None
         self.speed = speed
@@ -49,7 +50,8 @@ class Train(Agent):
         self.model.space.move_agent(self, new_position)
 
     def step(self):
-        if self.pos == self.next_station.pos:
+        distance = self.model.space.get_distance(self.pos, self.next_station.pos)
+        if distance < 4:
             self.current_station = self.next_station
             self.next_station = self.current_station.next_station
             self.wait_timer = 1
@@ -60,10 +62,9 @@ class Train(Agent):
             self.move()
 
 
-class Station(Agent):
+class Station:
 
-    def __init__(self, pos, unique_id, model):
-        super().__init__(unique_id, model)
+    def __init__(self, pos):
         self.train_list = []
         self.pos = pos
         self.next_station = None
