@@ -74,4 +74,4 @@ save_button = ButtonModule()
 server = ModularServer(SimModel,
                        [space, infected_chart, save_button],
                        "Sim Model",
-                       {"N": 1000, "width": 1000, "height": 1000})
+                       {"N": 100, "width": 1000, "height": 1000})

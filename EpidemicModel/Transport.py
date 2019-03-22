@@ -52,8 +52,23 @@ class Train(Agent):
     def step(self):
         distance = self.model.space.get_distance(self.pos, self.next_station.pos)
         if distance < 4:
-            self.current_station = self.next_station
-            self.next_station = self.current_station.next_station
+            if self.direction == 1:
+                if self.next_station.next_station is not None:
+                    self.current_station = self.next_station
+                    self.next_station = self.current_station.next_station
+                else:
+                    self.current_station = self.next_station
+                    self.next_station = self.current_station.prev_station
+                    self.direction = 0
+            else:
+                if self.next_station.prev_station is not None:
+                    self.current_station = self.next_station
+                    self.next_station = self.current_station.prev_station
+                else:
+                    self.current_station = self.next_station
+                    self.next_station = self.current_station.next_station
+                    self.direction = 1
+
             self.wait_timer = 1
 
         if self.wait_timer != 0:

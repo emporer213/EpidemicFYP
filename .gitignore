@@ -112,3 +112,4 @@ EpidemicModel/results\.xlsx
 
 \.idea/workspace\.xml
 !/venv/Lib/site-packages/mesa/time.py
+!/venv/Lib/site-packages/mesa/space.py

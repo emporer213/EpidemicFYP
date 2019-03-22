@@ -16,11 +16,13 @@ class EpiAgent(Agent):
         self.wait_timer = 0
         self.home = None
         self.work = None
+        self.transport_dest = None
         self.current_final_dest = None
         self.home_time = 39
         self.work_time = 21
         self.type = 0
         self.action = "Travelling"
+        self.transport_dir = None
 
     def move(self):
             new_position = self.model.calculate_move(self.pos, self.current_final_dest, self.speed)
@@ -55,6 +57,30 @@ class EpiAgent(Agent):
                 if (self.model.steps - self.exposed_step) > exposed_duration:
                     self.health_state = self.model.disease_model.health_state_dictionary.get("Infected")[1]
                     self.infected_step = self.model.steps
+
+    def get_transport_route(self):
+        nearest_station = self.model.space.get_nearest_station(self.pos, 10)
+        self.transport_dest = nearest_station.pos
+
+        if nearest_station.next_station is not None and nearest_station.prev_station is not None:
+            dist_to_final_next = self.model.space.get_distance(nearest_station.next_station.pos,
+                                                               self.current_final_dest)
+            dist_to_final_prev = self.model.space.get_distance(nearest_station.prev_station.pos,
+                                                               self.current_final_dest)
+            if dist_to_final_next < dist_to_final_prev:
+                self.transport_dir = 1
+            else:
+                self.transport_dir = 0
+        elif nearest_station.prev_station is not None:
+            self.transport_dir = 0
+        else:
+            self.transport_dir = 1
+            
+        if self.transport_dir == 1:
+            current_station = nearest_station.next_station
+            prev_distance =
+            while current_station.next_station is not None:
+
 
     def is_at_work(self):
         if self.action == "Work":

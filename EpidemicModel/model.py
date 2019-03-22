@@ -44,7 +44,7 @@ class SimModel(Model):
         self.home_locations = []
         self.running = True
         self.num_agents = N
-        self.space = ContinuousSpace(width, height, True)
+        self.space = ContinuousSpace(width, height, False)
         self.schedule = RandomActivation(self)
         self.disease_model = SEIRModel(infection_radius=10)
         self.steps = 0
@@ -52,7 +52,7 @@ class SimModel(Model):
         self.train_list = []
         self.num_train_lines = train_line_num
         self.area_list = [Area((250, 250), 20, 50),
-                          Area((50, 50), 30, 75),
+                          Area((800, 800), 30, 75),
                           Area((300, 50), 15, 25),
                           Area((400, 400), 15, 25),
                           Area((500, 600), 20, 50)]
@@ -90,10 +90,13 @@ class SimModel(Model):
             index = 0
             for s in range(0, random.randrange(stn_limit[0], stn_limit[1])):
                 new_station_pos = self.calculate_move(station_list[index].pos, self.space.center, 30)
+                if self.space.out_of_bounds(new_station_pos):
+                    break
                 new_station = Station(new_station_pos)
                 new_station.prev_station = station_list[index]
                 station_list[index].next_station = new_station
                 station_list.append(new_station)
+                self.space.place_station(new_station, new_station.pos)
                 index += 1
             self.train_lines.append(TrainLine(station_list))
 
@@ -129,11 +132,7 @@ def pop_gen(pop_size, model):
             velocity = np.random.random(2) * 2 - 1
             a = EpiAgent(model.agent_ids, model, velocity, 2)
             model.schedule.add(a)
-            x = random.randrange(al.location[0] - al.location_radius, al.location[0] + al.location_radius)
-            y = random.randrange(al.location[1] - al.location_radius, al.location[1] + al.location_radius)
-            while (x - al.location[0]) ** 2 + (y - al.location[1]) ** 2 > al.location_radius ** 2:
-                x = random.randrange(al.location[0] - al.location_radius, al.location[0] + al.location_radius)
-                y = random.randrange(al.location[1] - al.location_radius, al.location[1] + al.location_radius)
+            x, y = rand_loc(al.location, al.location_radius, model)
             model.space.place_agent(a, (x, y))
 
             a.home = random.choice(model.home_locations)
@@ -145,3 +144,19 @@ def pop_gen(pop_size, model):
 
     patient_zero = random.choice(model.schedule.agents)
     patient_zero.health_state = model.disease_model.health_state_dictionary.get("Infected")[1]
+
+
+def rand_loc(area_location, area_radius, model):
+    x_loc_range = (area_location[0] - area_radius, area_location[0] + area_radius)
+    y_loc_range = (area_location[1] - area_radius, area_location[1] + area_radius)
+
+    x = random.randrange(x_loc_range[0], x_loc_range[1])
+    y = random.randrange(y_loc_range[0], y_loc_range[1])
+
+    while (x - area_location[0]) ** 2 + (y - area_location[1]) ** 2 > area_radius ** 2:
+        x = random.randrange(x_loc_range[0], x_loc_range[1])
+        y = random.randrange(y_loc_range[0], y_loc_range[1])
+    if model.space.out_of_bounds((x, y)):
+        rand_loc(area_location, area_radius, model)
+
+    return x, y
