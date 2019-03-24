@@ -51,11 +51,14 @@ class SimModel(Model):
         self.train_lines = []
         self.train_list = []
         self.num_train_lines = train_line_num
-        self.area_list = [Area((250, 250), 20, 50),
-                          Area((800, 800), 30, 75),
-                          Area((300, 50), 15, 25),
-                          Area((400, 400), 15, 25),
-                          Area((500, 600), 20, 50)]
+        self.area_list = [Area((1000, 100), 10, 100),
+                          Area((2000, 100), 10, 75),
+                          Area((3000, 100), 15, 100),
+                          Area((1000, 1000), 20, 200),
+                          Area((2000, 2500), 15, 250),
+                          Area((3000, 3000), 10, 100),
+                          Area((2000, 3000), 15, 100),
+                          Area((1000, 3500), 5, 100)]
 
         self.agent_ids = 1
 
@@ -85,25 +88,40 @@ class SimModel(Model):
         )
 
     def generate_transport_net(self, stn_limit):
+        central_line = TrainLine([])
+        central_station = Station(self.space.center, central_line)
+        central_line.station_list.append(central_station)
+        self.space.place_station(central_station, central_station.pos)
         for al in self.area_list:
-            station_list = [Station(al.location)]
+            train_line = TrainLine([])
+            station_list = [central_station]
             index = 0
             for s in range(0, random.randrange(stn_limit[0], stn_limit[1])):
-                new_station_pos = self.calculate_move(station_list[index].pos, self.space.center, 30)
+                new_station_pos = self.calculate_move(station_list[index].pos, al.location, 200)
                 if self.space.out_of_bounds(new_station_pos):
                     break
-                new_station = Station(new_station_pos)
-                new_station.prev_station = station_list[index]
-                station_list[index].next_station = new_station
+
+                if self.space.get_distance(al.location, new_station_pos) < 1:
+                    break
+                new_station = Station(new_station_pos, line=train_line)
                 station_list.append(new_station)
                 self.space.place_station(new_station, new_station.pos)
                 index += 1
-            self.train_lines.append(TrainLine(station_list))
+            train_line.station_list = station_list
+            self.train_lines.append(train_line)
+
+            station_list[0].connections.append(Connection(station_list[1], station_list[0], train_line, 1))
+            for i in range(1, (len(station_list) - 1)):
+                station_list[i].connections.append(Connection(station_list[i-1], station_list[i], train_line, 0))
+                station_list[i].connections.append(Connection(station_list[i+1], station_list[i], train_line, 1))
+            last_index = len(station_list) - 1
+            station_list[last_index].connections.append(Connection(station_list[last_index-1], station_list[last_index],
+                                                                   train_line, 0))
 
             for st in station_list:
                 if random.choice((True, False)):
                     self.agent_ids += 1
-                    tr = Train(None, st, self, 8, self.agent_ids)
+                    tr = Train(st, self, 8, self.agent_ids, train_line)
                     self.space.place_agent(tr, st.pos)
                     self.train_list .append(tr)
                     st.train_list.append(tr)
