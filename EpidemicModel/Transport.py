@@ -29,14 +29,14 @@ class Train(Agent):
         self.current_dest = (random.choice(self.route)).connection_to
 
     def get_connections(self):
-        connections = self.current_station.get_connections_for_line(self.direction, self.line)
+        connections = self.current_station.get_directional_connections_for_line(self.direction, self.line)
         if connections is None or len(connections) == 0:
             if self.direction == 1:
                 self.direction = 0
             else:
                 self.direction = 1
 
-        connections = self.current_station.get_connections_for_line(self.direction, self.line)
+        connections = self.current_station.get_directional_connections_for_line(self.direction, self.line)
 
         return connections
 
@@ -55,6 +55,7 @@ class Train(Agent):
     def step(self):
         if self.is_at_station():
             self.current_station = self.current_dest
+            self.current_station.train_list.append(self)
             self.route = self.get_connections()
             self.current_dest = random.choice(self.route)
             self.current_dest = self.current_dest.connection_to
@@ -110,7 +111,11 @@ class Station:
                     return train
         return None
 
-    def get_connections_for_line(self, direction, line):
+    def get_connections_for_line(self, line):
+        connections = [connection for connection in self.connections if connection.line == line]
+        return connections
+
+    def get_directional_connections_for_line(self, direction, line):
         connections = [connection for connection in self.connections if connection.line == line
                        and connection.direction == direction]
         return connections

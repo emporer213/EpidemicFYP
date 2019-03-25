@@ -12,7 +12,8 @@ def agent_portrayal(agent):
     portrayal = {"Shape": "circle",
                  "Filled": "true",
                  "Color": "grey",
-                 "LineColor": "grey"}
+                 "LineColor": "grey",
+                 "Layer": 3}
     if agent.type == 0:
         if agent.health_state == agent.model.disease_model.health_state_dictionary.get("Infected")[1]:
             portrayal["Color"] = "red"
@@ -22,12 +23,12 @@ def agent_portrayal(agent):
         elif agent.health_state == agent.model.disease_model.health_state_dictionary.get("Recovered")[1]:
             portrayal["Color"] = "green"
             portrayal["LineColor"] = "green"
-            portrayal["Layer"] = 1
+            portrayal["Layer"] = 2
             portrayal["r"] = 3
         elif agent.health_state == agent.model.disease_model.health_state_dictionary.get("Exposed")[1]:
             portrayal["Color"] = "yellow"
             portrayal["LineColor"] = "yellow"
-            portrayal["Layer"] = 2
+            portrayal["Layer"] = 1
             portrayal["r"] = 2.5
         else:
             portrayal["r"] = 3
@@ -46,7 +47,7 @@ def station_portrayal(station):
         "Shape": "circle",
         "Filled": "True",
         "Color": "MidnightBlue",
-        "Layer": 2,
+        "Layer": 4,
         "LineColor": "MidnightBlue",
         "r": 5
     }
@@ -56,9 +57,10 @@ def station_portrayal(station):
 def train_portrayal(train):
     portrayal = {
         "Shape": "rect",
+        #"Filled": "True",
         "Color": "PaleTurquoise",
         "LineColor": "PaleTurquoise",
-        "Layer": 3,
+        "Layer": 5,
         "w": 0.025,
         "h": 0.01
     }
@@ -74,4 +76,4 @@ save_button = ButtonModule()
 server = ModularServer(SimModel,
                        [space, infected_chart, save_button],
                        "Sim Model",
-                       {"N": 100, "width": 4000, "height": 4000})
+                       {"N": 2000, "width": 1000, "height": 1000})

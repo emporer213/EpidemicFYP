@@ -51,14 +51,14 @@ class SimModel(Model):
         self.train_lines = []
         self.train_list = []
         self.num_train_lines = train_line_num
-        self.area_list = [Area((1000, 100), 10, 100),
-                          Area((2000, 100), 10, 75),
-                          Area((3000, 100), 15, 100),
-                          Area((1000, 1000), 20, 200),
-                          Area((2000, 2500), 15, 250),
-                          Area((3000, 3000), 10, 100),
-                          Area((2000, 3000), 15, 100),
-                          Area((1000, 3500), 5, 100)]
+        self.area_list = [Area((700, 100), 20, 100),
+                          Area((100, 100), 15, 75),
+                          Area((500, 100), 20, 100),
+                          Area((600, 500), 25, 200),
+                          Area((300, 800), 20, 50)]
+                         # Area((3000, 3000), 10, 100),
+                         # Area((2000, 3000), 15, 100),
+                         # Area((1000, 3500), 5, 100)]
 
         self.agent_ids = 1
 
@@ -97,7 +97,7 @@ class SimModel(Model):
             station_list = [central_station]
             index = 0
             for s in range(0, random.randrange(stn_limit[0], stn_limit[1])):
-                new_station_pos = self.calculate_move(station_list[index].pos, al.location, 200)
+                new_station_pos = self.calculate_move(station_list[index].pos, al.location, 50)
                 if self.space.out_of_bounds(new_station_pos):
                     break
 
@@ -156,6 +156,7 @@ def pop_gen(pop_size, model):
             a.home = random.choice(model.home_locations)
             a.work = random.choice(model.work_locations)
             a.current_final_dest = a.work
+            a.get_transport_goals()
 
             al.agents.append(a)
             model.agent_ids += 1
