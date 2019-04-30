@@ -28,9 +28,11 @@ class EpiAgent(Agent):
         self.transport_dir = None
         self.train = None
         self.transport_line = None
+        self.state_when_infected = None
+        self.use_transport = True
 
     def move(self, dest):
-            new_position = self.model.calculate_move(self.pos, dest, self.speed)
+            new_position = self.model.calculate_agent_move(self.pos, dest, self.speed)
             self.model.space.move_agent(self, new_position)
 
     def step(self):
@@ -41,7 +43,7 @@ class EpiAgent(Agent):
                 if self.train.current_station == self.transport_final_dest:
                     self.leave_train()
                     self.move(self.current_final_dest)
-                    self.state = "Travelling"
+                    self.state = "Walking"
                 elif self.transport_final_dest.line != self.train.line:
                     connections = self.train.current_station.get_connections_for_line(self.transport_final_dest.line)
                     if len(connections) != 0:
@@ -64,8 +66,9 @@ class EpiAgent(Agent):
                     self.train = self.transport_dest.get_available_train(self.transport_dir, self.transport_line)
                     self.train.passengers.append(self)
                     self.state = "On Train"
-
-        if self.get_distance(self.pos, self.current_final_dest) < 1:
+            else:
+                self.move(self.transport_dest.pos)
+        elif self.get_distance(self.pos, self.current_final_dest) < 1:
             if self.current_final_dest == self.home:
                 self.state = "Home"
                 self.wait_timer = self.home_time
@@ -78,8 +81,11 @@ class EpiAgent(Agent):
             self.wait_timer -= 1
         elif self.state == "Travelling to Station":
             self.move(self.transport_dest.pos)
-        elif self.state == "Travelling":
+        elif self.state == "Walking":
             self.move(self.current_final_dest)
+        else:
+            self.state = "Travelling to Station"
+            self.get_transport_goals()
 
     def check_infect_condition(self):
 

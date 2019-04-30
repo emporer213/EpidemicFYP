@@ -74,6 +74,6 @@ n_slider = UserSettableParameter('slider', "Number of Agents", 2000, 2, 10000, 1
 space = SimpleCanvas(agent_portrayal, train_portrayal, station_portrayal, canvas_height=1000, canvas_width=1000)
 save_button = ButtonModule()
 server = ModularServer(SimModel,
-                       [space, infected_chart, save_button],
+                       [space, save_button],
                        "Sim Model",
-                       {"N": 2000, "width": 1000, "height": 1000})
+                       {"N": 4000, "width": 4000, "height": 4000})

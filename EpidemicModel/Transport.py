@@ -47,6 +47,9 @@ class Train(Agent):
         self.calculate_heading()
         self.velocity = self.heading
         self.velocity /= np.linalg.norm(self.velocity)
+        distance = self.model.space.get_distance(self.pos, self.current_dest.pos)
+        if distance < self.speed:
+            self.speed = self.speed / distance
         new_position = self.pos + self.velocity * self.speed
         self.model.space.move_agent(self, new_position)
         for agent in self.passengers:
@@ -59,6 +62,7 @@ class Train(Agent):
             self.route = self.get_connections()
             self.current_dest = random.choice(self.route)
             self.current_dest = self.current_dest.connection_to
+            self.speed = 66
             self.wait_timer = 1
 
         if self.wait_timer != 0:

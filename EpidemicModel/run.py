@@ -1,29 +1,26 @@
 # run.py
-# from EpidemicModel.model import *
-# from mesa.batchrunner import BatchRunner
-# import matplotlib.pyplot as plt
-# import numpy as np
+from EpidemicModel.model import *
+from mesa.batchrunner import BatchRunner
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
 
 from EpidemicModel.server import server
 
+from tqdm import tqdm
+
+# Use this to run a simulation with visualization
 server.port = 8521
 server.launch()
 
-
-
-# fixed_params = {"width": 10,
-#                 "height": 10}
-# variable_params = {"N": range(10, 500, 10)}
-#
-# batch_run = BatchRunner(MoneyModel,
-#                         fixed_parameters=fixed_params,
-#                         variable_parameters=variable_params,
-#                         iterations=5,
-#                         max_steps=100,
-#                         model_reporters={"Gini": compute_gini})
-# batch_run.run_all()
-#
-# run_data = batch_run.get_model_vars_dataframe()
-# run_data.head()
-# plt.scatter(run_data.N, run_data.Gini)
-
+# Uncomment this section and comment the above section to run multiple simulations with no visualisation.
+'''model = SimModel(10000, 4000, 4000)
+total_steps = 3000
+for iteration in range(10):
+    step_iterator = tqdm(range(total_steps))
+    for steps in step_iterator:
+        model.step()
+    step_iterator.close()
+    filename = "results" + str(iteration)
+    model.save_data(filename)
+    model = SimModel(10000, 4000, 4000)'''

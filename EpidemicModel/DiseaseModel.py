@@ -1,9 +1,10 @@
+import random
 
 
 class SIRModel:
     health_state_dictionary = {
         "Susceptible": (0, 1),
-        "Infected": (10, 2),
+        "Infected": (600, 2),
         "Recovered": (0, 3)
     }
 
@@ -14,7 +15,7 @@ class SIRModel:
         self.recovered = (0, 3)
 
     def infect(self, agent):
-        neighbours = agent.model.space.get_neighbors(agent.pos, self.infection_radius, include_center=False)
+        neighbours = agent.model.space.get_neighbors(agent.pos, self.infection_radius, include_center=True)
         if len(neighbours) > 1:
             for neighbour in neighbours:
                 if neighbour.type == 0:
@@ -26,20 +27,20 @@ class SIRModel:
 class SEIRModel(SIRModel):
     health_state_dictionary = {
         "Susceptible": (0, 1),
-        "Exposed": (5, 2),
-        "Infected": (10, 3),
+        "Exposed": (240, 2),
+        "Infected": (600, 3),
         "Recovered": (0, 4)
     }
 
     def infect(self, agent):
         neighbours = agent.model.space.get_neighbors(agent.pos, self.infection_radius, include_center=False)
-        if len(neighbours) > 1:
-            for neighbour in neighbours:
-                if neighbour.type == 0:
-                    if neighbour.health_state == agent.model.disease_model.health_state_dictionary.get("Susceptible")[1]:
-                        neighbour.health_state = agent.model.disease_model.health_state_dictionary.get("Exposed")[1]
-                        neighbour.exposed_step = agent.model.steps
+        human_neighbours = [neighbour for neighbour in neighbours if neighbour.type == 0]
+        if len(neighbours) > 0:
+            susceptible_neighbour = [neighbour for neighbour in human_neighbours if neighbour.health_state ==
+                                     self.health_state_dictionary.get("Susceptible")[1]]
 
-
-
-
+            if len(susceptible_neighbour) > 0:
+                neighbour_to_infect = random.choice(susceptible_neighbour)
+                neighbour_to_infect.health_state = self.health_state_dictionary.get("Exposed")[1]
+                neighbour_to_infect.exposed_step = agent.model.steps
+                neighbour_to_infect.state_when_infected = neighbour_to_infect.state
